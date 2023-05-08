@@ -40,7 +40,7 @@
             "converter": "api.converters.data_resource.LocalDockerSingleVariableDataResourceConverter",
             "spec": {
                 "attribute_type": "VariableDataResource", 
-                "resource_type": ["WIG", "BIGWIG", "BEDGRAPH"],
+                "resource_types": ["WIG", "BIGWIG", "BEDGRAPH"],
                 "many": false
             }
         }
