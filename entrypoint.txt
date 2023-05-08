@@ -1,0 +1,1 @@
+/opt/software/run.sh {{input_file}} "{{organism}}" {{target_format}}

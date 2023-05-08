@@ -1,0 +1,50 @@
+{
+    "name": "WIG/BigWIG/BedGraph conversion", 
+    "description": "This tool will convert between the various IGV-compatible display files. In particular, conversion to BigWig format can aid with faster, indexed access in larger WIG and BedGraph files.", 
+    "inputs": {
+        "input_file": {
+            "description": "The input file. Note that if there are problems with the formatting, this tool will not work.", 
+            "name": "Your input file (WIG, BigWig, BedGraph):", 
+            "required": true, 
+            "converter": "api.converters.data_resource.LocalDockerSingleDataResourceWithTypeConverter",
+            "spec": {
+                "attribute_type": "VariableDataResource", 
+                "resource_types": ["WIG", "BIGWIG", "BEDGRAPH"], 
+                "many": false
+            }
+        }, 
+        "organism": {
+            "description": "The organism (and genome version) you are working with. Note that the versions with \"Ensembl\" do NOT have \"chr\" prefixes for the chromosomes. The UCSC versions DO include that prefix.", 
+            "name": "Reference organism:", 
+            "required": true, 
+            "converter": "api.converters.basic_attributes.UnrestrictedStringConverter",
+            "spec": {
+                "attribute_type": "OptionString",
+                "options": ["Human(Ensembl)","Mouse(Ensembl)", "Human(UCSC)", "Mouse(UCSC)"]
+            }
+        },
+        "target_format": {
+            "description": "The final/target format.", 
+            "name": "Target format:", 
+            "required": true, 
+            "converter": "api.converters.basic_attributes.UnrestrictedStringConverter",
+            "spec": {
+                "attribute_type": "OptionString",
+                "options": ["Wig", "BigWig", "BedGraph"]
+            }
+        }
+    }, 
+    "outputs": {
+        "output_file": {
+            "required": true,
+            "converter": "api.converters.data_resource.LocalDockerSingleVariableDataResourceConverter",
+            "spec": {
+                "attribute_type": "VariableDataResource", 
+                "resource_type": ["WIG", "BIGWIG", "BEDGRAPH"],
+                "many": false
+            }
+        }
+    }, 
+    "mode": "local_docker",
+    "workspace_operation": true
+}
