@@ -51,11 +51,11 @@ case $ORGANISM in
         exit 1;
 esac
 
-# if we are converting FROM bigwig, just set CHR_SZ
-# to an empty string so it will be ignored in the command we run below
-if [ $TARGET_FORMAT != "BIGWIG" ]; then
-    CHR_SZ=""
-fi
+# a flag to indicate whether the conversion requires two 'steps'.
+# For instance, UCSC does not release a tool to go from wig to bedgraph.
+# Hence, we do wig -> bigwig -> bedgraph, which requires running two
+# executables.
+DOUBLE_STEP=0
 
 # Depending on which conversion we are doing, select the proper tool.
 # Also define a canonical suffix for the target output file format:
@@ -68,19 +68,38 @@ elif [[ $TARGET_FORMAT == "BIGWIG" && $INPUT_FORMAT == "BEDGRAPH" ]]; then
 elif [[ $TARGET_FORMAT == "WIG" && $INPUT_FORMAT == "BIGWIG" ]]; then
     EXE="/opt/software/bigWigToWig"
     SUFFIX="wig"
+    CHR_SZ=""
 elif [[ $TARGET_FORMAT == "BEDGRAPH" && $INPUT_FORMAT == "BIGWIG" ]]; then
     EXE="/opt/software/bigWigToBedGraph"
     SUFFIX="bg"
+    CHR_SZ=""
+elif [[ $TARGET_FORMAT == "BEDGRAPH" && $INPUT_FORMAT == "WIG" ]]; then
+    EXE1="/opt/software/wigToBigWig"
+    EXE2="/opt/software/bigWigToBedGraph"
+    SUFFIX="bg"
+    DOUBLE_STEP=1
+elif [[ $TARGET_FORMAT == "WIG" && $INPUT_FORMAT == "BEDGRAPH" ]]; then
+    EXE1="/opt/software/bedGraphToBigWig"
+    EXE2="/opt/software/bigWigToWig"
+    SUFFIX="wig"
+    DOUBLE_STEP=1
 else
     echo "Something went wrong."
+    exit 1
 fi
 
 # The output file with a canonical suffix
 OUTPUT_PREFIX="${INPUT_FILE%.*}"
 OUTPUT=$OUTPUT_PREFIX.$SUFFIX
 
-# The actual command to run:
-$EXE $INPUT_FILE $CHR_SZ $OUTPUT
+if [ $DOUBLE_STEP == 0 ]; then
+    # If making a direct conversion. CHR_SZ has already been set to an empty string if not 
+    # part of the command
+    $EXE $INPUT_FILE $CHR_SZ $OUTPUT
+else
+    # In the conversion where we convert to bigwig as an intermediate, we always need
+    # the chrom sizes file. 
+    $EXE1 $INPUT_FILE $CHR_SZ intermediate.tmp && $EXE2 intermediate.tmp $OUTPUT
 
 if [ $? == 0 ]
 then
