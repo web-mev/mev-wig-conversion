@@ -100,6 +100,7 @@ else
     # In the conversion where we convert to bigwig as an intermediate, we always need
     # the chrom sizes file. 
     $EXE1 $INPUT_FILE $CHR_SZ intermediate.tmp && $EXE2 intermediate.tmp $OUTPUT
+fi
 
 if [ $? == 0 ]
 then
