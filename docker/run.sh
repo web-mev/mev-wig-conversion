@@ -61,16 +61,16 @@ fi
 # Also define a canonical suffix for the target output file format:
 if [[ $TARGET_FORMAT == "BIGWIG" && $INPUT_FORMAT == "WIG" ]]; then
     EXE="/opt/software/wigToBigWig"
-    SUFFIX="wig"
+    SUFFIX="bw"
 elif [[ $TARGET_FORMAT == "BIGWIG" && $INPUT_FORMAT == "BEDGRAPH" ]]; then
     EXE="/opt/software/bedGraphToBigWig"
-    SUFFIX="bg"
+    SUFFIX="bw"
 elif [[ $TARGET_FORMAT == "WIG" && $INPUT_FORMAT == "BIGWIG" ]]; then
-    EXE="/opt/software/wigToBigWig"
-    SUFFIX="bw"
+    EXE="/opt/software/bigWigToWig"
+    SUFFIX="wig"
 elif [[ $TARGET_FORMAT == "BEDGRAPH" && $INPUT_FORMAT == "BIGWIG" ]]; then
-    EXE="/opt/software/bedGraphToBigWig"
-    SUFFIX="bw"
+    EXE="/opt/software/bigWigToBedGraph"
+    SUFFIX="bg"
 else
     echo "Something went wrong."
 fi
@@ -85,7 +85,7 @@ $EXE $INPUT_FILE $CHR_SZ $OUTPUT
 if [ $? == 0 ]
 then
     BN=$(dirname $INPUT_FILE)
-    echo "{\"output_file\": \"$OUTPUT\"}" > $BN/outputs.json
+    echo "{\"output_file\": {\"path\":\"$OUTPUT\", \"resource_type\": \"$TARGET_FORMAT\"}}" > $BN/outputs.json
 else
     exit 1
 fi
