@@ -1,7 +1,9 @@
 From ubuntu:jammy
 
 RUN apt-get update &&\
-  apt-get install -y wget libcurl4-openssl-dev
+  apt-get install -y wget \
+    libcurl4-openssl-dev \
+    python3
 
 # Install all software under /opt/software:
 RUN mkdir -p /opt/software && mkdir -p /opt/software/resources
